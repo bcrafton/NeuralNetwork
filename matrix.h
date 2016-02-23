@@ -55,6 +55,7 @@ unsigned int test_col_to_vector();
 unsigned int test_matrix_load();
 unsigned int test_matrix_prepend_row();
 unsigned int test_matrix_remove_row();
+unsigned int test_matrix_random();
 
 matrix_t* roll_matrix_list(matrix_list_t* list);
 matrix_list_t* unroll_matrix_list(matrix_t* vector, int num, unsigned int sizes[][2]);
@@ -73,3 +74,5 @@ matrix_t* row_to_vector(matrix_t* m, unsigned int row);
 matrix_t* col_to_vector(matrix_t* m, unsigned int col);
 
 double matrix_average(matrix_t* m);
+
+matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range);

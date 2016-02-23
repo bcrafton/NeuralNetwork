@@ -68,6 +68,10 @@ unsigned int matrix_test()
 	assert(success);
 	printf("remove row pass\n");
 
+	success = test_matrix_random();
+	assert(success);
+	printf("matrix random pass\n");
+
 	return 1;
 }
 
@@ -445,7 +449,26 @@ unsigned int test_matrix_load()
 	matrix_t* X_transpose = matrix_transpose(X);
 	matrix_t* product = matrix_multiply(X_transpose, y);
 
-	print_matrix(product);
+	//print_matrix(product);
+
+	return 1;
+}
+
+
+unsigned int test_matrix_random()
+{
+	matrix_t* x = matrix_random(10, 26, .12);
+	//print_matrix(x);
+
+	int i, j;
+	for(i=0; i<x->rows; i++)
+	{
+		for(j=0; j<x->cols; j++)
+		{
+			if(matrix_get(x, i, j) > .12 || matrix_get(x, i, j) < -.12)
+				return 0;
+		}
+	}
 
 	return 1;
 }

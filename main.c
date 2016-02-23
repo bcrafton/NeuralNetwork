@@ -17,7 +17,9 @@ int main(void) {
 
 
 	// todo: fix this retarded rand init weights function
-	matrix_list_t* theta = random_init_weights(num_layers, layer_sizes);
+	matrix_list_t* theta = matrix_list_constructor(2);
+	theta->matrix_list[0] = matrix_random(25, 401, .12);
+	theta->matrix_list[1] = matrix_random(10, 26, .12);
 	//theta->matrix_list[0] = load_from_file("theta1.csv", 25, 401);
 	//theta->matrix_list[1] = load_from_file("theta2.csv", 10, 26);
 	
@@ -32,7 +34,10 @@ int main(void) {
 	free(tmp);
 
 	gradient_descent(rolled_theta, layer_sizes, num_layers, num_labels, X, y, lambda);
+
+	free_matrix(X);
+	free_matrix(y);
+	free_matrix(rolled_theta);
 #endif
 	return 1;
 }
-

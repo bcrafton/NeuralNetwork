@@ -399,3 +399,20 @@ void print_matrix_dimensions(matrix_t* m)
 {
 	printf("%dx%d\n", m->rows, m->cols);
 }
+
+matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range)
+{
+	srand(time(NULL));
+	matrix_t *m = matrix_constructor(rows, cols);
+
+	unsigned int i, j;
+	for(i=0; i<rows; i++)
+	{
+		for(j = 0; j<cols; j++)
+		{
+			double random = ((double)(rand() % 1000)) / (double)1000;
+			matrix_set(m, i, j, random * 2 * range - range);
+		}
+	}
+	return m;
+}

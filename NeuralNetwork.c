@@ -11,10 +11,10 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 	matrix_list_t* theta = unroll_matrix_list(rolled_theta, num_layers-1, theta_sizes);
 
 	unsigned int m = X->rows;
-	unsigned int n = X->cols;
+	//unsigned int n = X->cols;
 
 	matrix_list_t* theta_gradient = matrix_list_constructor(theta->num);
-	unsigned int i, j, k;
+	unsigned int i, j;
 	for(i=0; i<theta_gradient->num; i++)
 	{
 		theta_gradient->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
@@ -140,7 +140,7 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 	for(i=0; i < ITERATION_NUMBER; i++)
 	{
 		printf("itr: %d\n", i);
-		double cost = NN_cost_function(&gradient, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lamda);
+		NN_cost_function(&gradient, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lamda);
 
 		matrix_t* tmp;
 		tmp = matrix_scalar_multiply(gradient, ALPHA);
