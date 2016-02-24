@@ -1,7 +1,7 @@
 # NeuralNetwork
 C implementation for Neural network from Stanford's machine learning course on Coursera. 
 ### Compilation
-This is Written for gcc c compiler.
+This is written for gcc c compiler.
 
 It can be compiled with the following shell command:
 gcc main.c matrix.c matrix_util.c NeuralNetwork.c vector.c -lm
