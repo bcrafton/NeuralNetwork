@@ -4,7 +4,7 @@
 #define MATRIX_TEST 0
 #define MATRIX_UTIL_TEST 0
 
-int main(void) {
+int main(int argc,char **argv) {
 #if (MATRIX_TEST)
 	matrix_test();
 #elif (MATRIX_UTIL_TEST)
@@ -14,9 +14,17 @@ int main(void) {
 	unsigned int num_layers = 3;
 	unsigned int num_labels = 10;
 	double lambda = 0.8;
+	/*
+	if(argc < 2)
+	{
+		printf("need exactly 1 argument for vector length\n");
+		return 0;
+	}
+    unsigned int iteration_number = atoi(argv[1]);
+    */
 
+	unsigned int iteration_number = 100;
 
-	// todo: fix this retarded rand init weights function
 	matrix_list_t* theta = matrix_list_constructor(2);
 	theta->matrix_list[0] = matrix_random(25, 401, .12);
 	theta->matrix_list[1] = matrix_random(10, 26, .12);
@@ -33,7 +41,15 @@ int main(void) {
 	matrix_t* y = matrix_transpose(tmp);
 	free_matrix(tmp);
 
-	gradient_descent(rolled_theta, layer_sizes, num_layers, num_labels, X, y, lambda);
+	clock_t start, end;
+	double cpu_time_used;
+	start = clock();
+
+	gradient_descent(rolled_theta, layer_sizes, num_layers, num_labels, X, y, lambda, iteration_number);
+
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("time used: %f", cpu_time_used);
 
 	free_matrix(X);
 	free_matrix(y);

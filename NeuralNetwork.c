@@ -1,7 +1,6 @@
 #include "NeuralNetwork.h"
 
-#define ALPHA .8
-#define ITERATION_NUMBER 100
+#define ALPHA .5
 
 double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
 		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda)
@@ -122,13 +121,13 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 
 
 void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
-		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda)
+		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda, unsigned int iteration_number)
 {
 	unsigned int theta_sizes[][2] = {{25, 401}, {10, 26}};
 	matrix_t* gradient;
 
 	unsigned int i;
-	for(i=0; i < ITERATION_NUMBER; i++)
+	for(i=0; i < iteration_number; i++)
 	{
 		printf("itr: %d\n", i);
 		NN_cost_function(&gradient, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lamda);
