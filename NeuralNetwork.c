@@ -20,30 +20,15 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		theta_gradient->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
 	}
 
-	matrix_list_t* A = matrix_list_constructor(num_layers);
-	matrix_list_t* Z = matrix_list_constructor(num_layers);
-	matrix_list_t* delta = matrix_list_constructor(num_layers);
-
-	A->matrix_list[0] = matrix_prepend_col(X, 1.0);
-	for(i=1; i<num_layers; i++)
-	{
-		matrix_t* theta_transpose = matrix_transpose(theta->matrix_list[i-1]);
-		Z->matrix_list[i] = matrix_multiply(A->matrix_list[i-1], theta_transpose);
-		free_matrix(theta_transpose);
-		
-		matrix_t* temp = matrix_sigmoid(Z->matrix_list[i]);
-
-		free_matrix(A->matrix_list[i]);
-		A->matrix_list[i] = matrix_prepend_col(temp, 1.0);
-
-		free_matrix(temp);
-	}
-
 	matrix_t* temp;
 	matrix_t* temp2;
 	matrix_t* temp3;
 	for(i=0; i<m; i++)
 	{
+		matrix_list_t* A = matrix_list_constructor(num_layers);
+		matrix_list_t* Z = matrix_list_constructor(num_layers-1);
+		matrix_list_t* delta = matrix_list_constructor(num_layers-1);
+
 		A->matrix_list[0] = row_to_vector(X, i);
 		temp = matrix_prepend_col(A->matrix_list[0], 1.0);
 		free_matrix(A->matrix_list[0]);
@@ -51,27 +36,19 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		A->matrix_list[0] = matrix_transpose(temp);
 		free_matrix(temp);
 
-		for(j=1; j<num_layers; j++)
+		for(j=0; j<num_layers-1; j++)
 		{
-			Z->matrix_list[j] = matrix_multiply(theta->matrix_list[j-1], A->matrix_list[j-1]);
-			free_matrix(A->matrix_list[j]);
+			Z->matrix_list[j] = matrix_multiply(theta->matrix_list[j], A->matrix_list[j]);
 
 			temp = matrix_sigmoid(Z->matrix_list[j]);
-			A->matrix_list[j] = matrix_prepend_row(temp, 1.0);
+			A->matrix_list[j+1] = matrix_prepend_row(temp, 1.0);
 			free_matrix(temp);
-		}
-
-		if(i % 1000 == 0)
-		{
-			//print_matrix(Z->matrix_list[1]);
-			//printf("%f\n", matrix_average(theta->matrix_list[0]));
-			//printf("%f\n", matrix_average(theta->matrix_list[1]));
 		}
 
 		temp = matrix_remove_row(A->matrix_list[num_layers-1]);
 		free_matrix(A->matrix_list[num_layers-1]);
 		A->matrix_list[num_layers-1] = temp;
-		// flag
+
 		matrix_t* class = matrix_constructor(1, num_labels);
 		for(j = 0; j < num_labels; j++)
 		{
@@ -83,21 +60,18 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		temp = matrix_transpose(class);
 		free_matrix(class);
 		class = temp;
-		// end flag
-		
-		delta->matrix_list[2] = matrix_subtract(A->matrix_list[num_layers-1], class);
-		
-		// flag
-		matrix_t* theta_transpose = matrix_transpose(theta->matrix_list[1]);
-		temp = matrix_multiply(theta_transpose, delta->matrix_list[2]);
 
-		matrix_t* sig_gradient = matrix_sigmoid_gradient(Z->matrix_list[1]);
+		delta->matrix_list[1] = matrix_subtract(A->matrix_list[num_layers-1], class);
+
+		matrix_t* theta_transpose = matrix_transpose(theta->matrix_list[1]);
+		temp = matrix_multiply(theta_transpose, delta->matrix_list[1]);
+
+		matrix_t* sig_gradient = matrix_sigmoid_gradient(Z->matrix_list[0]);
 		temp2 = matrix_prepend_row(sig_gradient, 1.0);
 
 		temp3 = matrix_cell_multiply(temp, temp2);
-		delta->matrix_list[1] = matrix_remove_row(temp3);
+		delta->matrix_list[0] = matrix_remove_row(temp3);
 
-		// end flag
 		free_matrix(temp);
 		free_matrix(temp2);
 		free_matrix(temp3);
@@ -105,9 +79,15 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		for(j=0; j<num_layers-1; j++)
 		{
 			matrix_t* A_transpose = matrix_transpose(A->matrix_list[j]);
-			temp = matrix_multiply(delta->matrix_list[j+1], A_transpose);
+			temp = matrix_multiply(delta->matrix_list[j], A_transpose);
 			theta_gradient->matrix_list[j] = matrix_add(theta_gradient->matrix_list[j], temp);
+
+			free_matrix(A_transpose);
+			free_matrix(temp);
 		}
+		free_matrix_list(A);
+		free_matrix_list(Z);
+		free_matrix_list(delta);
 	}
 	
 	for(i=0; i<num_layers-1; i++)
@@ -124,8 +104,12 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		free(temp2);
 		free(temp3);
 	}
-	//print_matrix(theta_gradient->matrix_list[1]);
+
 	*gradient = roll_matrix_list(theta_gradient);
+
+	free_matrix_list(theta);
+	free_matrix_list(theta_gradient);
+
 	return 0.0;
 }
 
@@ -191,8 +175,6 @@ double accuracy(matrix_list_t* theta, matrix_t* X, matrix_t* y)
 	temp = matrix_prepend_col(h1, 1.0);
 	temp2 = matrix_multiply(temp, theta_transpose);
 	matrix_t* h2 = matrix_sigmoid(temp2);
-
-	//print_matrix(h2);
 
 	assert(h2->rows == 5000 && h2->cols == 10);
 	matrix_t* p = matrix_constructor(1, 5000);

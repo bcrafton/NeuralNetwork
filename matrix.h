@@ -26,6 +26,7 @@ matrix_t* matrix_sigmoid(matrix_t* m);
 matrix_t* matrix_square(matrix_t* m);
 matrix_t* matrix_sigmoid_gradient(matrix_t* m);
 matrix_t* matrix_cell_multiply(matrix_t* m1, matrix_t* m2);
+void free_matrix_list(matrix_list_t* m);
 
 matrix_t* load_from_file(char* filename, unsigned int rows, unsigned int cols);
 

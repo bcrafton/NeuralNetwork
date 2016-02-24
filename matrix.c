@@ -195,13 +195,19 @@ matrix_list_t* matrix_list_constructor(unsigned int num)
 
 void free_matrix(matrix_t* m)
 {
-	if(m != NULL)
+	assert(m != NULL);
+	assert(m->matrix != NULL);
+	free(m->matrix);
+	free(m);
+}
+
+void free_matrix_list(matrix_list_t* m)
+{
+	assert(m != NULL);
+	int i;
+	for(i=0; i<m->num; i++)
 	{
-		if(m->matrix != NULL)
-		{
-			free(m->matrix);
-		}
-		free(m);
+		free_matrix(m->matrix_list[i]);
 	}
 }
 
