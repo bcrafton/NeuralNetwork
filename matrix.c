@@ -209,6 +209,7 @@ void free_matrix_list(matrix_list_t* m)
 	{
 		free_matrix(m->matrix_list[i]);
 	}
+	free(m);
 }
 
 matrix_t* matrix_sigmoid(matrix_t* m)

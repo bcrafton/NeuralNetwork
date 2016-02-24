@@ -31,13 +31,13 @@ int main(void) {
 	matrix_t* X = load_from_file("X.csv", 5000, 400);
 	matrix_t* tmp = load_from_file("y.csv", 5000, 1);
 	matrix_t* y = matrix_transpose(tmp);
-	free(tmp);
+	free_matrix(tmp);
 
 	gradient_descent(rolled_theta, layer_sizes, num_layers, num_labels, X, y, lambda);
 
 	free_matrix(X);
 	free_matrix(y);
-	free_matrix(rolled_theta);
+	free_matrix_list(theta);
 #endif
 	return 1;
 }

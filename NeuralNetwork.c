@@ -1,7 +1,7 @@
 #include "NeuralNetwork.h"
 
 #define ALPHA .8
-#define ITERATION_NUMBER 15
+#define ITERATION_NUMBER 100
 
 double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
 		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda)
@@ -62,6 +62,7 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		class = temp;
 
 		delta->matrix_list[1] = matrix_subtract(A->matrix_list[num_layers-1], class);
+		free_matrix(class);
 
 		matrix_t* theta_transpose = matrix_transpose(theta->matrix_list[1]);
 		temp = matrix_multiply(theta_transpose, delta->matrix_list[1]);
@@ -75,12 +76,17 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		free_matrix(temp);
 		free_matrix(temp2);
 		free_matrix(temp3);
+		free_matrix(sig_gradient);
+		free_matrix(theta_transpose);
 
 		for(j=0; j<num_layers-1; j++)
 		{
 			matrix_t* A_transpose = matrix_transpose(A->matrix_list[j]);
 			temp = matrix_multiply(delta->matrix_list[j], A_transpose);
-			theta_gradient->matrix_list[j] = matrix_add(theta_gradient->matrix_list[j], temp);
+			temp2 = matrix_add(theta_gradient->matrix_list[j], temp);
+			free_matrix(theta_gradient->matrix_list[j]);
+			theta_gradient->matrix_list[j] = temp2;
+
 
 			free_matrix(A_transpose);
 			free_matrix(temp);
@@ -98,11 +104,12 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		{
 			matrix_set(temp2, j, 0, 0.0);
 		}
+		free_matrix(theta_gradient->matrix_list[i]);
 		temp3 = matrix_scalar_multiply(temp2, lamda/m);
 		theta_gradient->matrix_list[i] = matrix_add(temp, temp3);
-		free(temp);
-		free(temp2);
-		free(temp3);
+		free_matrix(temp);
+		free_matrix(temp2);
+		free_matrix(temp3);
 	}
 
 	*gradient = roll_matrix_list(theta_gradient);
@@ -128,15 +135,19 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 
 		matrix_t* tmp;
 		tmp = matrix_scalar_multiply(gradient, ALPHA);
-		free(gradient);
+		free_matrix(gradient);
 		gradient = tmp;
 
 		tmp = matrix_subtract(rolled_theta, gradient);
-		free(rolled_theta);
+		free_matrix(rolled_theta);
 		rolled_theta = tmp;
+
+		free_matrix(gradient);
 	}
 	matrix_list_t* theta = unroll_matrix_list(rolled_theta, num_layers-1, theta_sizes);
 	printf("accuracy: %f\n", accuracy(theta, X, y));
+	free_matrix_list(theta);
+	free_matrix(rolled_theta);
 }
 
 
@@ -171,10 +182,18 @@ double accuracy(matrix_list_t* theta, matrix_t* X, matrix_t* y)
 	temp2 = matrix_multiply(temp, theta_transpose);
 	matrix_t* h1 = matrix_sigmoid(temp2);
 
+	free_matrix(theta_transpose);
+	free_matrix(temp);
+	free_matrix(temp2);
+
 	theta_transpose = matrix_transpose(theta->matrix_list[1]);
 	temp = matrix_prepend_col(h1, 1.0);
 	temp2 = matrix_multiply(temp, theta_transpose);
 	matrix_t* h2 = matrix_sigmoid(temp2);
+
+	free_matrix(theta_transpose);
+	free_matrix(temp);
+	free_matrix(temp2);
 
 	assert(h2->rows == 5000 && h2->cols == 10);
 	matrix_t* p = matrix_constructor(1, 5000);
@@ -200,6 +219,10 @@ double accuracy(matrix_list_t* theta, matrix_t* X, matrix_t* y)
 		if(vector_get(y, i) == vector_get(p, i))
 			count = count + 1;
 	}
+
+	free_matrix(p);
+	free_matrix(h1);
+	free_matrix(h2);
 	
 	return count/5000;
 }
