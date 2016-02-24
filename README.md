@@ -7,8 +7,8 @@ It can be compiled with the following shell command: </br>
 **gcc main.c matrix.c matrix_util.c NeuralNetwork.c vector.c -lm**
 
 The user also needs to specify the number of iterations that they would like to do, this is done by adding an integer after running the binary.</br>
-Example:
-**./a.out 100** // this will run for 100 iterations
+Example: To run gradient descent for 100 iterations add '100' after running the binary </br>
+**./a.out 100**
 ###Data
 The training data and some already created matrices are available in the form of csv files included in this repo. As is, the program is using the premade matrices to eliminate randomness for debugging and for grading.
 
