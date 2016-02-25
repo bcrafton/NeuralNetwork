@@ -123,16 +123,13 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
 		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda, unsigned int iteration_number)
 {
-	clock_t start, end;
-	double cpu_time_used;
-	start = clock();
-
 	unsigned int theta_sizes[][2] = {{25, 401}, {10, 26}};
 	matrix_t* gradient;
 
 	unsigned int i;
 	for(i=0; i < iteration_number; i++)
 	{
+		printf("itr: %d\n", i);
 		NN_cost_function(&gradient, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lamda);
 
 		matrix_t* tmp;
@@ -145,16 +142,10 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 		rolled_theta = tmp;
 
 		free_matrix(gradient);
-
-		if((i+1) % 100 == 0)
-		{
-			end = clock();
-			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-			matrix_list_t* theta = unroll_matrix_list(rolled_theta, num_layers-1, theta_sizes);
-			printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(theta, X, y), cpu_time_used);
-			free_matrix_list(theta);
-		}
 	}
+	matrix_list_t* theta = unroll_matrix_list(rolled_theta, num_layers-1, theta_sizes);
+	printf("accuracy: %f\n", accuracy(theta, X, y));
+	free_matrix_list(theta);
 	free_matrix(rolled_theta);
 }
 
