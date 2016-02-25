@@ -5,10 +5,13 @@ This is written for gcc c compiler.
 
 It can be compiled with the following shell command: </br>
 **gcc main.c matrix.c matrix_util.c NeuralNetwork.c vector.c -lm**
-
+### Running the Code
 The user also needs to specify the number of iterations that they would like to do, this is done by adding an integer after running the binary.</br>
 Example: To run gradient descent for 100 iterations add '100' after running the binary </br>
 **./a.out 100**
+### Running the code on the discovery cluster
+In this repo there is a script called NN.bash. In this script I include both the compile shell command and the command to execute the code for 100 iterations. The user only needs to modify the script for their name and directory on the discovery cluster and execute:</br>
+bsub< NN.bash
 ###Data
 The training data and some already created matrices are available in the form of csv files included in this repo. As is, the program is using the premade matrices to eliminate randomness for debugging and for grading.
 
