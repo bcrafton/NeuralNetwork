@@ -17,14 +17,14 @@ matrix_t* matrix_constructor(unsigned int rows, unsigned int cols)
 	return m;
 }
 
-inline double matrix_get(matrix_t* m, unsigned int x, unsigned int y)
+double matrix_get(matrix_t* m, unsigned int x, unsigned int y)
 {
 	assert(m != NULL);
 	assert(x >= 0 && x < m->rows && y >= 0 && y < m->cols);
 	return (m->matrix[x * m->cols + y]);
 }
 
-inline void matrix_set(matrix_t* m, unsigned int x, unsigned int y, double value)
+void matrix_set(matrix_t* m, unsigned int x, unsigned int y, double value)
 {
 	assert(m != NULL);
 	assert(x >= 0 && x < m->rows && y >= 0 && y < m->cols);
@@ -258,66 +258,66 @@ matrix_t* matrix_square(matrix_t* m)
 
 matrix_t* matrix_prepend_col(matrix_t* m, double value)
 {
-	matrix_t* new = matrix_constructor(m->rows, m->cols+1);
+	matrix_t* result = matrix_constructor(m->rows, m->cols+1);
 	unsigned int i, j;
-	for(i=0; i<new->rows; i++)
+	for(i=0; i<result->rows; i++)
 	{
-		matrix_set(new, i, 0, value);
+		matrix_set(result, i, 0, value);
 	}
 	for(i=0; i<m->rows; i++)
 	{
 		for(j=0; j<m->cols; j++)
 		{
-			matrix_set(new, i, j+1, matrix_get(m, i, j));
+			matrix_set(result, i, j+1, matrix_get(m, i, j));
 		}
 	}
-	return new;
+	return result;
 }
 
 matrix_t* matrix_remove_col(matrix_t* m)
 {
-	matrix_t* new = matrix_constructor(m->rows, m->cols-1);
+	matrix_t* result = matrix_constructor(m->rows, m->cols-1);
 	unsigned int i, j;
-	for(i=0; i<new->rows; i++)
+	for(i=0; i<result->rows; i++)
 	{
-		for(j=0; j<new->cols; j++)
+		for(j=0; j<result->cols; j++)
 		{
-			matrix_set(new, i, j, matrix_get(m, i, j+1));
+			matrix_set(result, i, j, matrix_get(m, i, j+1));
 		}
 	}
-	return new;
+	return result;
 }
 
 matrix_t* matrix_prepend_row(matrix_t* m, double value)
 {
-	matrix_t* new = matrix_constructor(m->rows+1, m->cols);
+	matrix_t* result = matrix_constructor(m->rows+1, m->cols);
 	unsigned int i, j;
-	for(i=0; i<new->cols; i++)
+	for(i=0; i<result->cols; i++)
 	{
-		matrix_set(new, 0, i, value);
+		matrix_set(result, 0, i, value);
 	}
 	for(i=0; i<m->rows; i++)
 	{
 		for(j=0; j<m->cols; j++)
 		{
-			matrix_set(new, i+1, j, matrix_get(m, i, j));
+			matrix_set(result, i+1, j, matrix_get(m, i, j));
 		}
 	}
-	return new;
+	return result;
 }
 
 matrix_t* matrix_remove_row(matrix_t* m)
 {
-	matrix_t* new = matrix_constructor(m->rows-1, m->cols);
+	matrix_t* result = matrix_constructor(m->rows-1, m->cols);
 	unsigned int i, j;
-	for(i=0; i<new->rows; i++)
+	for(i=0; i<result->rows; i++)
 	{
-		for(j=0; j<new->cols; j++)
+		for(j=0; j<result->cols; j++)
 		{
-			matrix_set(new, i, j, matrix_get(m, i+1, j));
+			matrix_set(result, i, j, matrix_get(m, i+1, j));
 		}
 	}
-	return new;
+	return result;
 }
 
 matrix_t* row_to_vector(matrix_t* m, unsigned int row)
@@ -361,7 +361,7 @@ matrix_t* matrix_cell_multiply(matrix_t* m1, matrix_t* m2)
 	return product;
 }
 
-matrix_t* load_from_file(char* filename, unsigned int rows, unsigned int cols)
+matrix_t* load_from_file(const char* filename, unsigned int rows, unsigned int cols)
 {
 	matrix_t* m = matrix_constructor(rows, cols);
 
@@ -420,6 +420,19 @@ matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range)
 			double random = ((double)(rand() % 1000)) / (double)1000;
 			matrix_set(m, i, j, random * 2 * range - range);
 		}
+	}
+	return m;
+}
+
+matrix_list_t* matrix_list_add(matrix_list_t* m1, matrix_list_t* m2)
+{
+	assert(m1->num == m2->num);
+	matrix_list_t* m = matrix_list_constructor(m1->num);
+
+	int i;
+	for(i=0; i<m1->num; i++)
+	{
+		m->matrix_list[i] = matrix_add(m1->matrix_list[i], m2->matrix_list[i]);
 	}
 	return m;
 }

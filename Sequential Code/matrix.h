@@ -28,12 +28,13 @@ matrix_t* matrix_sigmoid_gradient(matrix_t* m);
 matrix_t* matrix_cell_multiply(matrix_t* m1, matrix_t* m2);
 void free_matrix_list(matrix_list_t* m);
 
-matrix_t* load_from_file(char* filename, unsigned int rows, unsigned int cols);
+double matrix_get(matrix_t* m, unsigned int x, unsigned int y);
+void matrix_set(matrix_t* m, unsigned int x, unsigned int y, double value);
+
+matrix_t* load_from_file(const char* filename, unsigned int rows, unsigned int cols);
 
 void set_matrix(matrix_t* m, double val);
 void set_matrix_index(matrix_t* m);
-inline double matrix_get(matrix_t* m, unsigned int x, unsigned int y);
-inline void matrix_set(matrix_t* m, unsigned int x, unsigned int y, double value);
 
 void print_matrix(matrix_t* m);
 void print_matrix_dimensions(matrix_t* m);
@@ -77,3 +78,5 @@ matrix_t* col_to_vector(matrix_t* m, unsigned int col);
 double matrix_average(matrix_t* m);
 
 matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range);
+
+matrix_list_t* matrix_list_add(matrix_list_t* m1, matrix_list_t* m2);
