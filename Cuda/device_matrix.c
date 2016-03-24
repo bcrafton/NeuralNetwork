@@ -4,14 +4,12 @@ __device__ matrix_t* device_matrix_constructor(unsigned int rows, unsigned int c
 {
 	assert(rows > 0 && cols > 0);
 
-	matrix_t* m = (matrix_t*)malloc(sizeof(matrix_t));
+	matrix_t* m = (matrix_t*)malloc(sizeof(matrix_t) + sizeof(float) * rows * cols);
+	
 	assert(m != NULL);
 
 	m->rows = rows;
 	m->cols = cols;
-
-	m->matrix = (float*)malloc(sizeof(float) * rows * cols);
-	assert(m->matrix != NULL);
 	set_matrix(m, 0.0);
 
 	return m;
@@ -388,4 +386,9 @@ __device__ matrix_list_t* device_matrix_list_add(matrix_list_t* m1, matrix_list_
 		m->matrix_list[i] = matrix_add(m1->matrix_list[i], m2->matrix_list[i]);
 	}
 	return m;
+}
+
+__device__ unsigned int device_matrix_memory_size(matrix_t* m)
+{
+	return sizeof(matrix_t) + sizeof(float) * rows + cols;
 }

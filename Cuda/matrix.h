@@ -4,7 +4,7 @@ typedef struct matrix_t
 {
 	unsigned int rows;
 	unsigned int cols;
-	float* matrix;
+	float matrix[0];
 } matrix_t;
 
 typedef struct matrix_list_t
@@ -38,6 +38,8 @@ void set_matrix_index(matrix_t* m);
 
 void print_matrix(matrix_t* m);
 void print_matrix_dimensions(matrix_t* m);
+
+unsigned int matrix_memory_size(matrix_t* m);
 
 unsigned int matrix_test();
 unsigned int test_matrix_add();
@@ -120,3 +122,5 @@ __device__ float device_matrix_average(matrix_t* m);
 __device__ matrix_t* device_matrix_random(unsigned int rows, unsigned int cols, float range);
 
 __device__ matrix_list_t* device_matrix_list_add(matrix_list_t* m1, matrix_list_t* m2);
+
+__device__ unsigned int device_matrix_memory_size(matrix_t* m);

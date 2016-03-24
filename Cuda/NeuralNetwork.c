@@ -2,8 +2,8 @@
 
 #define ALPHA .5
 
-__global__ void NN_cost_function(matrix_list_t* theta_gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
-		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda)
+__global__ void NN_cost_function(matrix_list_t* theta_gradient, matrix_t* rolled_theta, unsigned int* layer_sizes, unsigned int num_layers,
+		unsigned int num_labels, matrix_t* X, matrix_t* y, float lamda)
 {
 	unsigned int theta_sizes[][2] = {{25, 401}, {10, 26}};
 
@@ -119,9 +119,9 @@ __global__ void NN_cost_function(matrix_list_t* theta_gradient, matrix_t* rolled
 	return 0.0;
 }
 
-
+//todo: replace loop rolling and unrolling with matrix list arithmetic, WAY easier and simpler that way.
 void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
-		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda, unsigned int iteration_number)
+		unsigned int num_labels, matrix_t* X, matrix_t* y, float lamda, unsigned int iteration_number)
 {
 	int block_size = 1024;
 	int grid_size = 5000 / block_size;
@@ -130,12 +130,20 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 		grid_size = grid_size + 1;
 	}
 	
-	clock_t start, end;
-	double cpu_time_used;
-	start = clock();
-
 	unsigned int theta_sizes[][2] = {{25, 401}, {10, 26}};
-	matrix_t* gradient;
+	
+	// the 5 things that need to be passed to device with cudaMalloc, rest by value
+	matrix_t* device_X;
+	matrix_t* device_y;
+	matrix_list_t* device_theta;
+	unsigned int* device_theta_sizes;
+	matrix_list_t* device_theta_gradient;
+	
+	cudaMalloc(&device_X, matrix_memory_size(X));
+	cudaMalloc(&device_y, matrix_memory_size(y));
+	cudaMalloc(&device_theta, ); // need a matrix list matrix memory size
+	cudaMalloc(&device_theta_sizes, sizeof(theta_sizes)); // make sure this is the actual size
+	cudaMalloc(&device_theta_gradient, ); // size of theta * 5000
 
 	unsigned int i;
 	for(i=0; i < iteration_number; i++)
@@ -143,6 +151,7 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 		NN_cost_function<<<grid_size, block_size>>>(device_theta_gradient, device_rolled_theta, 
 			device_layer_sizes, num_layers, num_labels, device_X, device_y, lamda);
 
+		// NOT ACTUALLY USING THE gradient
 		matrix_t* tmp;
 		tmp = matrix_scalar_multiply(gradient, ALPHA);
 		free_matrix(gradient);
@@ -156,8 +165,6 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 
 		if((i+1) % 100 == 0)
 		{
-			end = clock();
-			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 			matrix_list_t* theta = unroll_matrix_list(rolled_theta, num_layers-1, theta_sizes);
 			printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(theta, X, y), cpu_time_used);
 			free_matrix_list(theta);
