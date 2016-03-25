@@ -144,10 +144,18 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 	cudaMalloc(&device_theta, ); // need a matrix list matrix memory size
 	cudaMalloc(&device_theta_sizes, sizeof(theta_sizes)); // make sure this is the actual size
 	cudaMalloc(&device_theta_gradient, ); // size of theta * 5000
-
+	
+	cudaMemcpy( device_X, X, matrix_memory_size(X), cudaMemcpyHostToDevice);
+	cudaMemcpy( device_y, y, matrix_memory_size(y), cudaMemcpyHostToDevice);
+	cudaMemcpy( device_theta, theta, , cudaMemcpyHostToDevice);
+	cudaMemcpy( device_theta_sizes, theta_sizes, sizeof(theta_sizes), cudaMemcpyHostToDevice);
+	cudaMemcpy( device_theta_gradient, theta_gradient, , cudaMemcpyHostToDevice);
+	
 	unsigned int i;
 	for(i=0; i < iteration_number; i++)
 	{
+		// this shud not just be a kernel.
+		// the cost function will wrap the kernel and then grab the resulting gradient and give it to gradient descent.
 		NN_cost_function<<<grid_size, block_size>>>(device_theta_gradient, device_rolled_theta, 
 			device_layer_sizes, num_layers, num_labels, device_X, device_y, lamda);
 
