@@ -57,4 +57,13 @@ matrix_list_t* matrix_list_scalar_multiply(matrix_list_t* m1, float scalar)
 	return m;
 }
 
-
+unsigned int matrix_list_memory_size(matrix_list_t* m)
+{
+	unsigned int memory_size = sizeof(matrix_list_t);
+	unsigned int i;
+	for(i=0; i<m->num; i++)
+	{
+		memory_size += matrix_memory_size(m->matrix_list[i]);
+	}
+	return memory_size;
+}

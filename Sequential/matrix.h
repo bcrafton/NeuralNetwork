@@ -5,7 +5,7 @@ typedef struct matrix_t
 {
 	unsigned int rows;
 	unsigned int cols;
-	double* matrix;
+	float matrix[];
 } matrix_t;
 
 typedef struct matrix_list_t
@@ -22,7 +22,7 @@ matrix_list_t* matrix_list_constructor(unsigned int num);
 matrix_t* matrix_add(matrix_t* m1, matrix_t* m2);
 matrix_t* matrix_subtract(matrix_t* m1, matrix_t* m2);
 matrix_t* matrix_multiply(matrix_t* m1, matrix_t* m2);
-matrix_t* matrix_scalar_multiply(matrix_t* m, double scalar);
+matrix_t* matrix_scalar_multiply(matrix_t* m, float scalar);
 matrix_t* matrix_sigmoid(matrix_t* m);
 matrix_t* matrix_square(matrix_t* m);
 matrix_t* matrix_sigmoid_gradient(matrix_t* m);
@@ -34,7 +34,7 @@ matrix_list_t* matrix_list_subtract(matrix_list_t* m1, matrix_list_t* m2);
 matrix_list_t* matrix_list_scalar_multiply(matrix_list_t* m1, float scalar);
 
 // matrix generation
-matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range);
+matrix_t* matrix_random(unsigned int rows, unsigned int cols, float range);
 matrix_t* load_from_file(const char* filename, unsigned int rows, unsigned int cols);
 matrix_t* copy_matrix(matrix_t* m);
 
@@ -43,19 +43,23 @@ void free_matrix(matrix_t* m);
 void free_matrix_list(matrix_list_t* m);
 
 // get/set
-double matrix_get(matrix_t* m, unsigned int x, unsigned int y);
-void matrix_set(matrix_t* m, unsigned int x, unsigned int y, double value);
-void set_matrix(matrix_t* m, double val);
+float matrix_get(matrix_t* m, unsigned int x, unsigned int y);
+void matrix_set(matrix_t* m, unsigned int x, unsigned int y, float value);
+void set_matrix(matrix_t* m, float val);
 void set_matrix_index(matrix_t* m);
-double vector_get(matrix_t* v, unsigned int x);
-void vector_set(matrix_t* v, unsigned int x, double value);
+float vector_get(matrix_t* v, unsigned int x);
+void vector_set(matrix_t* v, unsigned int x, float value);
 
 // print
 void print_matrix(matrix_t* m);
 void print_matrix_dimensions(matrix_t* m);
 
 // average
-double matrix_average(matrix_t* m);
+float matrix_average(matrix_t* m);
+
+// size
+unsigned int matrix_memory_size(matrix_t* m);
+unsigned int matrix_list_memory_size(matrix_list_t* m);
 
 // matrix partitioning
 matrix_list_t* matrix_list_add(matrix_list_t* m1, matrix_list_t* m2);
@@ -63,9 +67,9 @@ matrix_t* row_to_vector(matrix_t* m, unsigned int row);
 matrix_t* col_to_vector(matrix_t* m, unsigned int col);
 matrix_t* roll_matrix_list(matrix_list_t* list);
 matrix_list_t* unroll_matrix_list(matrix_t* vector, int num, unsigned int sizes[][2]);
-matrix_t* matrix_prepend_col(matrix_t* m, double value);
+matrix_t* matrix_prepend_col(matrix_t* m, float value);
 matrix_t* matrix_remove_col(matrix_t* m);
-matrix_t* matrix_prepend_row(matrix_t* m, double value);
+matrix_t* matrix_prepend_row(matrix_t* m, float value);
 matrix_t* matrix_remove_row(matrix_t* m);
 
 // Tests

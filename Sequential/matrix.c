@@ -4,27 +4,25 @@ matrix_t* matrix_constructor(unsigned int rows, unsigned int cols)
 {
 	assert(rows > 0 && cols > 0);
 
-	matrix_t* m = (matrix_t*)malloc(sizeof(matrix_t));
+	matrix_t* m = (matrix_t*)malloc(sizeof(matrix_t) + sizeof(float) * rows * cols);
+	
 	assert(m != NULL);
 
 	m->rows = rows;
 	m->cols = cols;
-
-	m->matrix = (double*)malloc(sizeof(double) * rows * cols);
-	assert(m->matrix != NULL);
 	set_matrix(m, 0.0);
 
 	return m;
 }
 
-double matrix_get(matrix_t* m, unsigned int x, unsigned int y)
+float matrix_get(matrix_t* m, unsigned int x, unsigned int y)
 {
 	assert(m != NULL);
 	assert(x >= 0 && x < m->rows && y >= 0 && y < m->cols);
 	return (m->matrix[x * m->cols + y]);
 }
 
-void matrix_set(matrix_t* m, unsigned int x, unsigned int y, double value)
+void matrix_set(matrix_t* m, unsigned int x, unsigned int y, float value)
 {
 	assert(m != NULL);
 	assert(x >= 0 && x < m->rows && y >= 0 && y < m->cols);
@@ -95,7 +93,7 @@ matrix_t* matrix_multiply(matrix_t* m1, matrix_t* m2)
 	return product;
 }
 
-matrix_t* matrix_scalar_multiply(matrix_t* m, double scalar)
+matrix_t* matrix_scalar_multiply(matrix_t* m, float scalar)
 {
 	assert(m!= NULL);
 	assert(m->rows > 0 && m->cols > 0);
@@ -133,7 +131,7 @@ matrix_t* matrix_transpose(matrix_t* m)
 }
 
 
-void set_matrix(matrix_t* m, double val)
+void set_matrix(matrix_t* m, float val)
 {
 	assert(m != NULL);
 	assert(m->rows > 0 && m->cols > 0);
@@ -166,7 +164,7 @@ void set_matrix_index(matrix_t* m)
 matrix_t* copy_matrix(matrix_t* m)
 {
 	matrix_t* copy = matrix_constructor(m->rows, m->cols);
-	memcpy(copy->matrix, m->matrix, sizeof(double)*m->rows*m->cols);
+	memcpy(copy->matrix, m->matrix, sizeof(float)*m->rows*m->cols);
 	return copy;
 }
 
@@ -188,8 +186,6 @@ void print_matrix(matrix_t* m)
 void free_matrix(matrix_t* m)
 {
 	assert(m != NULL);
-	assert(m->matrix != NULL);
-	free(m->matrix);
 	free(m);
 }
 
@@ -209,7 +205,7 @@ matrix_t* matrix_sigmoid(matrix_t* m)
 
 matrix_t* matrix_sigmoid_gradient(matrix_t* m)
 {
-	double sig;
+	float sig;
 	matrix_t* copy = copy_matrix(m);
 	int i, j;
 	for(i=0; i<m->rows; i++)
@@ -237,7 +233,7 @@ matrix_t* matrix_square(matrix_t* m)
 	return copy;
 }
 
-matrix_t* matrix_prepend_col(matrix_t* m, double value)
+matrix_t* matrix_prepend_col(matrix_t* m, float value)
 {
 	matrix_t* result = matrix_constructor(m->rows, m->cols+1);
 	unsigned int i, j;
@@ -269,7 +265,7 @@ matrix_t* matrix_remove_col(matrix_t* m)
 	return result;
 }
 
-matrix_t* matrix_prepend_row(matrix_t* m, double value)
+matrix_t* matrix_prepend_row(matrix_t* m, float value)
 {
 	matrix_t* result = matrix_constructor(m->rows+1, m->cols);
 	unsigned int i, j;
@@ -369,10 +365,10 @@ matrix_t* load_from_file(const char* filename, unsigned int rows, unsigned int c
 	return m;
 }
 
-double matrix_average(matrix_t* m)
+float matrix_average(matrix_t* m)
 {
 	int i, j;
-	double sum;
+	float sum;
 	for(i=0; i<m->rows; i++)
 	{
 		for(j=0; j<m->cols; j++)
@@ -388,7 +384,7 @@ void print_matrix_dimensions(matrix_t* m)
 	printf("%dx%d\n", m->rows, m->cols);
 }
 
-matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range)
+matrix_t* matrix_random(unsigned int rows, unsigned int cols, float range)
 {
 	srand(time(NULL));
 	matrix_t *m = matrix_constructor(rows, cols);
@@ -398,11 +394,16 @@ matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range)
 	{
 		for(j = 0; j<cols; j++)
 		{
-			double random = ((double)(rand() % 1000)) / (double)1000;
+			float random = ((float)(rand() % 1000)) / (float)1000;
 			matrix_set(m, i, j, random * 2 * range - range);
 		}
 	}
 	return m;
+}
+
+unsigned int matrix_memory_size(matrix_t* m)
+{
+	return sizeof(matrix_t) + sizeof(float) * m->rows * m->cols;
 }
 
 
