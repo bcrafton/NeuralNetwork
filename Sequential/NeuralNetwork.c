@@ -2,11 +2,9 @@
 
 #define ALPHA .5
 
-double NN_cost_function(matrix_list_t** gradient, matrix_list_t* theta, unsigned int layer_sizes[], unsigned int num_layers,
-		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda)
+void NN_cost_function(matrix_list_t** gradient, matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
+		matrix_t* X, matrix_t* y, double lamda)
 {
-	unsigned int theta_sizes[][2] = {{25, 401}, {10, 26}};
-
 	unsigned int m = X->rows;
 	//unsigned int n = X->cols;
 
@@ -110,13 +108,11 @@ double NN_cost_function(matrix_list_t** gradient, matrix_list_t* theta, unsigned
 	}
 
 	*gradient = theta_gradient;
-
-	return 0.0;
 }
 
 
-void gradient_descent(matrix_list_t* theta, unsigned int layer_sizes[], unsigned int num_layers,
-		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda, unsigned int iteration_number)
+void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned int num_labels, matrix_t* X, matrix_t* y,
+		double lamda, unsigned int iteration_number)
 {
 	clock_t start, end;
 	double cpu_time_used;
@@ -127,16 +123,16 @@ void gradient_descent(matrix_list_t* theta, unsigned int layer_sizes[], unsigned
 	unsigned int i;
 	for(i=0; i < iteration_number; i++)
 	{
-		NN_cost_function(&gradient, theta, layer_sizes, num_layers, num_labels, X, y, lamda);
+		NN_cost_function(&gradient, *theta, num_layers, num_labels, X, y, lamda);
 
 		matrix_list_t* tmp;
 		tmp = matrix_list_scalar_multiply(gradient, ALPHA);
 		free_matrix_list(gradient);
 		gradient = tmp;
 
-		tmp = matrix_list_subtract(theta, gradient);
-		free_matrix_list(theta);
-		theta = tmp;
+		tmp = matrix_list_subtract(*theta, gradient);
+		free_matrix_list(*theta);
+		*theta = tmp;
 
 		free_matrix_list(gradient);
 
@@ -144,7 +140,7 @@ void gradient_descent(matrix_list_t* theta, unsigned int layer_sizes[], unsigned
 		{
 			end = clock();
 			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-			printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(theta, X, y), cpu_time_used);
+			printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(*theta, X, y), cpu_time_used);
 		}
 	}
 }

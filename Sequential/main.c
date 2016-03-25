@@ -10,7 +10,7 @@ int main(int argc,char **argv) {
 #elif (MATRIX_UTIL_TEST)
 	matrix_util_test();
 #else
-	unsigned int layer_sizes[] = {400, 25, 10};
+	//unsigned int layer_sizes[] = {400, 25, 10};
 	unsigned int num_layers = 3;
 	unsigned int num_labels = 10;
 	double lambda = 0.8;
@@ -24,7 +24,7 @@ int main(int argc,char **argv) {
     unsigned int iteration_number = atoi(argv[1]);
    	*/
 
-	unsigned int iteration_number = 1;
+	unsigned int iteration_number = 10;
 
 	matrix_list_t* theta = matrix_list_constructor(2);
 	//theta->matrix_list[0] = matrix_random(25, 401, .12);
@@ -41,7 +41,7 @@ int main(int argc,char **argv) {
 	matrix_t* y = matrix_transpose(tmp);
 	free_matrix(tmp);
 
-	gradient_descent(theta, layer_sizes, num_layers, num_labels, X, y, lambda, iteration_number);
+	gradient_descent(&theta, num_layers, num_labels, X, y, lambda, iteration_number);
 
 	free_matrix(X);
 	free_matrix(y);
