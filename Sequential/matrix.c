@@ -185,30 +185,11 @@ void print_matrix(matrix_t* m)
 	}
 }
 
-matrix_list_t* matrix_list_constructor(unsigned int num)
-{
-	matrix_list_t* list = (matrix_list_t*)malloc(sizeof(matrix_list_t));
-	list->num = num;
-	list->matrix_list = (matrix_t**)malloc(sizeof(matrix_t*) * num);
-	return list;
-}
-
 void free_matrix(matrix_t* m)
 {
 	assert(m != NULL);
 	assert(m->matrix != NULL);
 	free(m->matrix);
-	free(m);
-}
-
-void free_matrix_list(matrix_list_t* m)
-{
-	assert(m != NULL);
-	int i;
-	for(i=0; i<m->num; i++)
-	{
-		free_matrix(m->matrix_list[i]);
-	}
 	free(m);
 }
 
@@ -424,15 +405,4 @@ matrix_t* matrix_random(unsigned int rows, unsigned int cols, double range)
 	return m;
 }
 
-matrix_list_t* matrix_list_add(matrix_list_t* m1, matrix_list_t* m2)
-{
-	assert(m1->num == m2->num);
-	matrix_list_t* m = matrix_list_constructor(m1->num);
 
-	int i;
-	for(i=0; i<m1->num; i++)
-	{
-		m->matrix_list[i] = matrix_add(m1->matrix_list[i], m2->matrix_list[i]);
-	}
-	return m;
-}
