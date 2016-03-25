@@ -388,7 +388,18 @@ __device__ matrix_list_t* device_matrix_list_add(matrix_list_t* m1, matrix_list_
 	return m;
 }
 
-__device__ unsigned int device_matrix_memory_size(matrix_t* m)
+ unsigned int device_matrix_memory_size(matrix_t* m)
 {
 	return sizeof(matrix_t) + sizeof(float) * rows + cols;
+}
+
+__device__ unsigned int device_matrix_list_memory_size(matrix_list_t* m)
+{
+	unsigned int memory_size = sizeof(matrix_list_t);
+	unsigned int i;
+	for(i=0; i<m->num; i++)
+	{
+		memory_size += device_matrix_memory_size(m->matrix_list[i]);
+	}
+	return memory_size;
 }

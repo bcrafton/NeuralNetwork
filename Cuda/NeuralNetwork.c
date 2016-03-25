@@ -141,15 +141,14 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 	
 	cudaMalloc(&device_X, matrix_memory_size(X));
 	cudaMalloc(&device_y, matrix_memory_size(y));
-	cudaMalloc(&device_theta, ); // need a matrix list matrix memory size
+	cudaMalloc(&device_theta, matrix_list_memory_size(theta));
 	cudaMalloc(&device_theta_sizes, sizeof(theta_sizes)); // make sure this is the actual size
-	cudaMalloc(&device_theta_gradient, ); // size of theta * 5000
+	cudaMalloc(&device_theta_gradient, matrix_list_memory_size(theta)*5000);
 	
 	cudaMemcpy( device_X, X, matrix_memory_size(X), cudaMemcpyHostToDevice);
 	cudaMemcpy( device_y, y, matrix_memory_size(y), cudaMemcpyHostToDevice);
-	cudaMemcpy( device_theta, theta, , cudaMemcpyHostToDevice);
+	cudaMemcpy( device_theta, theta, matrix_list_memory_size(theta), cudaMemcpyHostToDevice);
 	cudaMemcpy( device_theta_sizes, theta_sizes, sizeof(theta_sizes), cudaMemcpyHostToDevice);
-	cudaMemcpy( device_theta_gradient, theta_gradient, , cudaMemcpyHostToDevice);
 	
 	unsigned int i;
 	for(i=0; i < iteration_number; i++)

@@ -40,6 +40,7 @@ void print_matrix(matrix_t* m);
 void print_matrix_dimensions(matrix_t* m);
 
 unsigned int matrix_memory_size(matrix_t* m);
+unsigned int matrix_list_memory_size(matrix_list_t* m);
 
 unsigned int matrix_test();
 unsigned int test_matrix_add();
@@ -124,3 +125,4 @@ __device__ matrix_t* device_matrix_random(unsigned int rows, unsigned int cols, 
 __device__ matrix_list_t* device_matrix_list_add(matrix_list_t* m1, matrix_list_t* m2);
 
 __device__ unsigned int device_matrix_memory_size(matrix_t* m);
+__device__ unsigned int device_matrix_list_memory_size(matrix_list_t* m);
