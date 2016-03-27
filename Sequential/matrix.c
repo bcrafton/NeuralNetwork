@@ -4,8 +4,6 @@ static long memory_used = 0;
 static char tracking = 0;
 static long total_mallocs = 0;
 
-static buffer_t* buffer;
-
 long get_total_mallocs()
 {
 	return total_mallocs;
@@ -26,30 +24,21 @@ void stop_tracking()
 	tracking = 0;
 }
 
-void set_buffer(buffer_t* b)
-{
-	buffer = b;
-}
-
 matrix_t* matrix_constructor(unsigned int rows, unsigned int cols)
 {
-	
+	/*
 	if(tracking)
 	{
 		memory_used += sizeof(matrix_t) + sizeof(float) * rows * cols;
 		total_mallocs++;
 	}
+	*/
+
+	buffer_t* buffer = get_buffer();
 
 	assert(rows > 0 && cols > 0);
-
-	long memory_needed = sizeof(matrix_t) + sizeof(float) * rows * cols;
-	if(memory_needed > buffer->size - (buffer->current_index - buffer->pool))
-	{
-		return NULL;
-	}
 	
-	matrix_t* m = (matrix_t*)buffer->current_index;
-	buffer->current_index += memory_needed;
+	matrix_t* m = buffer_malloc(buffer, sizeof(matrix_t) + sizeof(float) * rows * cols);
 
 	m->rows = rows;
 	m->cols = cols;

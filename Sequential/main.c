@@ -23,13 +23,9 @@ int main(int argc,char **argv) {
 	}
     unsigned int iteration_number = atoi(argv[1]);
    	*/
-	buffer_t* b = malloc(sizeof(buffer_t) + 200000*5000);
+	buffer_t* b = buffer_constructor(5000 * 200000);
 	set_buffer(b);
 	assert(b != NULL);
-	b->current_index = b->pool;
-	b->size = 200000*5000;
-
-	matrix_t* x = matrix_constructor(1,1);
 
 	unsigned int iteration_number = 1;
 

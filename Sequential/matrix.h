@@ -1,4 +1,5 @@
 #include "NNinclude.h"
+#include "buffer.h"
 
 // types
 typedef struct matrix_t
@@ -13,13 +14,6 @@ typedef struct matrix_list_t
 	unsigned int num;
 	matrix_t** matrix_list;
 } matrix_list_t;
-
-typedef struct buffer_t
-{
-	unsigned long size;
-	char* current_index;
-	char pool[];
-} buffer_t;
 
 // constructors
 matrix_t* matrix_constructor(unsigned rows, unsigned cols);
@@ -108,5 +102,3 @@ void start_tracking();
 void stop_tracking();
 long get_memory_used();
 long get_total_mallocs();
-
-void set_buffer(buffer_t* b);

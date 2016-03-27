@@ -2,9 +2,11 @@
 
 matrix_list_t* matrix_list_constructor(unsigned int num)
 {
-	matrix_list_t* list = (matrix_list_t*)malloc(sizeof(matrix_list_t));
+	buffer_t* buffer = get_buffer();
+
+	matrix_list_t* list = (matrix_list_t*)buffer_malloc(buffer, sizeof(matrix_list_t));
 	list->num = num;
-	list->matrix_list = (matrix_t**)malloc(sizeof(matrix_t*) * num);
+	list->matrix_list = (matrix_t**)buffer_malloc(buffer, sizeof(matrix_t*) * num);
 	return list;
 }
 
