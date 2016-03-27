@@ -14,6 +14,13 @@ typedef struct matrix_list_t
 	matrix_t** matrix_list;
 } matrix_list_t;
 
+typedef struct buffer_t
+{
+	unsigned long size;
+	char* current_index;
+	char pool[];
+} buffer_t;
+
 // constructors
 matrix_t* matrix_constructor(unsigned rows, unsigned cols);
 matrix_list_t* matrix_list_constructor(unsigned int num);
@@ -95,3 +102,9 @@ unsigned int test_matrix_random();
 
 unsigned int matrix_util_test();
 unsigned int test_roll_unroll_matrices();
+
+// manual profiling
+void start_tracking();
+void stop_tracking();
+long get_memory_used();
+long get_total_mallocs();

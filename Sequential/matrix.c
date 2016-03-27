@@ -1,12 +1,55 @@
 #include "matrix.h"
 
+static long memory_used = 0;
+static char tracking = 0;
+static long total_mallocs = 0;
+
+static buffer_t* buffer;
+
+long get_total_mallocs()
+{
+	return total_mallocs;
+}
+
+long get_memory_used()
+{
+	return memory_used;
+}
+
+void start_tracking()
+{
+	tracking = 1;
+}
+
+void stop_tracking()
+{
+	tracking = 0;
+}
+
+void set_buffer(buffer_t* b)
+{
+	buffer = b;
+}
+
 matrix_t* matrix_constructor(unsigned int rows, unsigned int cols)
 {
+	
+	if(tracking)
+	{
+		memory_used += sizeof(matrix_t) + sizeof(float) * rows * cols;
+		total_mallocs++;
+	}
+
 	assert(rows > 0 && cols > 0);
 
-	matrix_t* m = (matrix_t*)malloc(sizeof(matrix_t) + sizeof(float) * rows * cols);
+	long memory_needed = sizeof(matrix_t) + sizeof(float) * rows * cols;
+	if(memory_needed > buffer->size - (buffer->current_index - buffer->pool))
+	{
+		return NULL;
+	}
 	
-	assert(m != NULL);
+	matrix_t* m = (matrix_t*)buffer->current_index;
+	buffer->current_index += memory_needed;
 
 	m->rows = rows;
 	m->cols = cols;

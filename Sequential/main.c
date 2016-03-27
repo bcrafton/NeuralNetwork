@@ -23,8 +23,10 @@ int main(int argc,char **argv) {
 	}
     unsigned int iteration_number = atoi(argv[1]);
    	*/
+	buffer_t* b = malloc(sizeof(buffer_t) + 200000*5000);
+	set_buffer(b);
 
-	unsigned int iteration_number = 10;
+	unsigned int iteration_number = 1;
 
 	matrix_list_t* theta = matrix_list_constructor(2);
 	//theta->matrix_list[0] = matrix_random(25, 401, .12);
@@ -47,5 +49,6 @@ int main(int argc,char **argv) {
 	free_matrix(y);
 	free_matrix_list(theta);
 #endif
+	printf("%ld %ld\n", get_memory_used(), get_total_mallocs());
 	return 1;
 }
