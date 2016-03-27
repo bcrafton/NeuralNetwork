@@ -228,8 +228,10 @@ void print_matrix(matrix_t* m)
 
 void free_matrix(matrix_t* m)
 {
+	/*
 	assert(m != NULL);
 	free(m);
+	*/
 }
 
 matrix_t* matrix_sigmoid(matrix_t* m)

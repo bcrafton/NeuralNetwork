@@ -25,6 +25,11 @@ int main(int argc,char **argv) {
    	*/
 	buffer_t* b = malloc(sizeof(buffer_t) + 200000*5000);
 	set_buffer(b);
+	assert(b != NULL);
+	b->current_index = b->pool;
+	b->size = 200000*5000;
+
+	matrix_t* x = matrix_constructor(1,1);
 
 	unsigned int iteration_number = 1;
 
@@ -49,6 +54,6 @@ int main(int argc,char **argv) {
 	free_matrix(y);
 	free_matrix_list(theta);
 #endif
-	printf("%ld %ld\n", get_memory_used(), get_total_mallocs());
+	//printf("%ld %ld\n", get_memory_used(), get_total_mallocs());
 	return 1;
 }

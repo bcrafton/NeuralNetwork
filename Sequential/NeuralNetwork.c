@@ -136,7 +136,7 @@ void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned i
 
 		free_matrix_list(gradient);
 
-		if((i+1) % 10 == 0)
+		if((i+1) % 1 == 0)
 		{
 			end = clock();
 			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;

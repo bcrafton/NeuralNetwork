@@ -10,6 +10,7 @@ matrix_list_t* matrix_list_constructor(unsigned int num)
 
 void free_matrix_list(matrix_list_t* m)
 {
+	/*
 	assert(m != NULL);
 	int i;
 	for(i=0; i<m->num; i++)
@@ -17,6 +18,7 @@ void free_matrix_list(matrix_list_t* m)
 		free_matrix(m->matrix_list[i]);
 	}
 	free(m);
+	*/
 }
 
 matrix_list_t* matrix_list_add(matrix_list_t* m1, matrix_list_t* m2)

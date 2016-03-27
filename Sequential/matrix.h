@@ -108,3 +108,5 @@ void start_tracking();
 void stop_tracking();
 long get_memory_used();
 long get_total_mallocs();
+
+void set_buffer(buffer_t* b);
