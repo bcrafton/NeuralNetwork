@@ -10,10 +10,6 @@ matrix_list_t* device_matrix_list_constructor(unsigned int num)
 	return list;
 }
 
-void free_matrix_list(matrix_list_t* m)
-{
-}
-
 matrix_list_t* device_matrix_list_add(matrix_list_t* m1, matrix_list_t* m2)
 {
 	assert(m1->num == m2->num);
@@ -50,4 +46,8 @@ matrix_list_t* device_matrix_list_scalar_multiply(matrix_list_t* m1, float scala
 		m->matrix_list[i] = device_matrix_scalar_multiply(m1->matrix_list[i], scalar);
 	}
 	return m;
+}
+
+void free_matrix_list(matrix_list_t* m)
+{
 }

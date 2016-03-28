@@ -28,8 +28,8 @@ matrix_t* matrix_subtract(matrix_t* m1, matrix_t* m2);
 matrix_t* matrix_multiply(matrix_t* m1, matrix_t* m2);
 matrix_t* matrix_scalar_multiply(matrix_t* m, float scalar);
 matrix_t* matrix_sigmoid(matrix_t* m);
-matrix_t* matrix_square(matrix_t* m);
 matrix_t* matrix_sigmoid_gradient(matrix_t* m);
+matrix_t* matrix_square(matrix_t* m);
 matrix_t* matrix_cell_multiply(matrix_t* m1, matrix_t* m2);
 matrix_t* matrix_transpose(matrix_t* m);
 
