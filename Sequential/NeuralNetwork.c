@@ -2,7 +2,7 @@
 
 #define ALPHA .5
 
-__global__ void calculate_gradient(matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
+__global__ void calculate_gradient(matrix_list_t* gradient, matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
 		matrix_t* X, matrix_t* y, double lamda)
 {
 	unsigned int m = X->rows;
@@ -109,16 +109,23 @@ void NN_cost_function(matrix_list_t** gradient, matrix_list_t* theta, unsigned i
 	matrix_t* device_y;
 	matrix_t* device_theta_gradient;
 	
-	cudaMalloc(device_theta_gradient, matrix_list_memory_size(theta));
-	cudaMalloc(device_theta, matrix_list_memory_size(theta));
-	cudaMalloc(device_X, matrix_list_memory_size(X));
-	cudaMalloc(device_y, matrix_list_memory_size(y));
+	cudaMalloc(&device_theta_gradient, matrix_list_memory_size(theta));
+	cudaMalloc(&device_theta, matrix_list_memory_size(theta));
+	cudaMalloc(&device_X, matrix_list_memory_size(X));
+	cudaMalloc(&device_y, matrix_list_memory_size(y));
 	
-	cudaMemCpy(device_y, y, );
-	cudaMemCpy(device_X, x, );
-	cudaMemCpy(device_theta, theta, );
+	cudaMemcpy(device_y, y, cudaMemcpyHostToDevice);
+	cudaMemcpy(device_X, x, cudaMemcpyHostToDevice);
+	cudaMemcpy(device_theta, theta, cudaMemcpyHostToDevice);
 	
-	<<<calculate_gradient(theta_gradient, theta, num_layers, num_labels, X, y, lamda)>>>
+	int block_size = 1024;
+	int grid_size = 5000 / block_size;
+	if(5000 % block_size)
+	{
+		grid_size = grid_size + 1;
+	}
+	
+	calculate_gradient<<<grid_size, block_size>>>(device_theta_gradient, device_theta, num_layers, num_labels, device_X, device_y, lamda);
 	
 	// perform the reduction here.
 	
