@@ -2,6 +2,95 @@
 
 #define ALPHA .5
 
+__global__ void calculate_gradient(matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
+		matrix_t* X, matrix_t* y, double lamda)
+{
+	unsigned int m = X->rows;
+	//unsigned int n = X->cols;
+
+	matrix_list_t* theta_gradient = device_matrix_list_constructor(theta->num);
+	unsigned int i, j;
+	for(i=0; i<theta_gradient->num; i++)
+	{
+		theta_gradient->matrix_list[i] = device_matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
+	}
+	
+	int tid = ;
+	
+	matrix_t* temp;
+	matrix_t* temp2;
+	matrix_t* temp3;
+	
+	matrix_list_t* A = device_matrix_list_constructor(num_layers);
+	matrix_list_t* Z = device_matrix_list_constructor(num_layers-1);
+	matrix_list_t* delta = device_matrix_list_constructor(num_layers-1);
+
+	A->matrix_list[0] = device_row_to_vector(X, tid);
+	temp = device_matrix_prepend_col(A->matrix_list[0], 1.0);
+	device_free_matrix(A->matrix_list[0]);
+
+	A->matrix_list[0] = device_matrix_transpose(temp);
+	device_free_matrix(temp);
+
+	for(j=0; j<num_layers-1; j++)
+	{
+		Z->matrix_list[j] = device_matrix_multiply(theta->matrix_list[j], A->matrix_list[j]);
+
+		temp = device_matrix_sigmoid(Z->matrix_list[j]);
+		A->matrix_list[j+1] = device_matrix_prepend_row(temp, 1.0);
+		device_free_matrix(temp);
+	}
+
+	temp = device_matrix_remove_row(A->matrix_list[num_layers-1]);
+	device_free_matrix(A->matrix_list[num_layers-1]);
+	A->matrix_list[num_layers-1] = temp;
+
+	matrix_t* class = device_matrix_constructor(1, num_labels);
+	for(j = 0; j < num_labels; j++)
+	{
+		if(device_vector_get(y, tid) == j)
+		{
+			device_vector_set(class, j, 1.0);
+		}
+	}
+	temp = device_matrix_transpose(class);
+	device_free_matrix(class);
+	class = temp;
+
+	delta->matrix_list[1] = device_matrix_subtract(A->matrix_list[num_layers-1], class);
+	device_free_matrix(class);
+
+	matrix_t* theta_transpose = device_matrix_transpose(theta->matrix_list[1]);
+	temp = device_matrix_multiply(theta_transpose, delta->matrix_list[1]);
+
+	matrix_t* sig_gradient = device_matrix_sigmoid_gradient(Z->matrix_list[0]);
+	temp2 = device_matrix_prepend_row(sig_gradient, 1.0);
+
+	temp3 = device_matrix_cell_multiply(temp, temp2);
+	delta->matrix_list[0] = device_matrix_remove_row(temp3);
+
+	device_free_matrix(temp);
+	device_free_matrix(temp2);
+	device_free_matrix(temp3);
+	device_free_matrix(sig_gradient);
+	device_free_matrix(theta_transpose);
+
+	for(j=0; j<num_layers-1; j++)
+	{
+		matrix_t* A_transpose = device_matrix_transpose(A->matrix_list[j]);
+		temp = device_matrix_multiply(delta->matrix_list[j], A_transpose);
+		temp2 = device_matrix_add(theta_gradient->matrix_list[j], temp);
+		device_free_matrix(theta_gradient->matrix_list[j]);
+		theta_gradient->matrix_list[j] = temp2;
+
+		device_free_matrix(A_transpose);
+		device_free_matrix(temp);
+	}
+	device_free_matrix_list(A);
+	device_free_matrix_list(Z);
+	device_free_matrix_list(delta);
+}
+
 void NN_cost_function(matrix_list_t** gradient, matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
 		matrix_t* X, matrix_t* y, double lamda)
 {
@@ -14,82 +103,24 @@ void NN_cost_function(matrix_list_t** gradient, matrix_list_t* theta, unsigned i
 	{
 		theta_gradient->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
 	}
-
-	matrix_t* temp;
-	matrix_t* temp2;
-	matrix_t* temp3;
-	for(i=0; i<m; i++)
-	{
-		matrix_list_t* A = matrix_list_constructor(num_layers);
-		matrix_list_t* Z = matrix_list_constructor(num_layers-1);
-		matrix_list_t* delta = matrix_list_constructor(num_layers-1);
-
-		A->matrix_list[0] = row_to_vector(X, i);
-		temp = matrix_prepend_col(A->matrix_list[0], 1.0);
-		free_matrix(A->matrix_list[0]);
-
-		A->matrix_list[0] = matrix_transpose(temp);
-		free_matrix(temp);
-
-		for(j=0; j<num_layers-1; j++)
-		{
-			Z->matrix_list[j] = matrix_multiply(theta->matrix_list[j], A->matrix_list[j]);
-
-			temp = matrix_sigmoid(Z->matrix_list[j]);
-			A->matrix_list[j+1] = matrix_prepend_row(temp, 1.0);
-			free_matrix(temp);
-		}
-
-		temp = matrix_remove_row(A->matrix_list[num_layers-1]);
-		free_matrix(A->matrix_list[num_layers-1]);
-		A->matrix_list[num_layers-1] = temp;
-
-		matrix_t* class = matrix_constructor(1, num_labels);
-		for(j = 0; j < num_labels; j++)
-		{
-			if(vector_get(y, i) == j)
-			{
-				vector_set(class, j, 1.0);
-			}
-		}
-		temp = matrix_transpose(class);
-		free_matrix(class);
-		class = temp;
-
-		delta->matrix_list[1] = matrix_subtract(A->matrix_list[num_layers-1], class);
-		free_matrix(class);
-
-		matrix_t* theta_transpose = matrix_transpose(theta->matrix_list[1]);
-		temp = matrix_multiply(theta_transpose, delta->matrix_list[1]);
-
-		matrix_t* sig_gradient = matrix_sigmoid_gradient(Z->matrix_list[0]);
-		temp2 = matrix_prepend_row(sig_gradient, 1.0);
-
-		temp3 = matrix_cell_multiply(temp, temp2);
-		delta->matrix_list[0] = matrix_remove_row(temp3);
-
-		free_matrix(temp);
-		free_matrix(temp2);
-		free_matrix(temp3);
-		free_matrix(sig_gradient);
-		free_matrix(theta_transpose);
-
-		for(j=0; j<num_layers-1; j++)
-		{
-			matrix_t* A_transpose = matrix_transpose(A->matrix_list[j]);
-			temp = matrix_multiply(delta->matrix_list[j], A_transpose);
-			temp2 = matrix_add(theta_gradient->matrix_list[j], temp);
-			free_matrix(theta_gradient->matrix_list[j]);
-			theta_gradient->matrix_list[j] = temp2;
-
-
-			free_matrix(A_transpose);
-			free_matrix(temp);
-		}
-		free_matrix_list(A);
-		free_matrix_list(Z);
-		free_matrix_list(delta);
-	}
+	
+	matrix_t* device_theta;
+	matrix_t* device_X;
+	matrix_t* device_y;
+	matrix_t* device_theta_gradient;
+	
+	cudaMalloc(device_theta_gradient, matrix_list_memory_size(theta));
+	cudaMalloc(device_theta, matrix_list_memory_size(theta));
+	cudaMalloc(device_X, matrix_list_memory_size(X));
+	cudaMalloc(device_y, matrix_list_memory_size(y));
+	
+	cudaMemCpy(device_y, y, );
+	cudaMemCpy(device_X, x, );
+	cudaMemCpy(device_theta, theta, );
+	
+	<<<calculate_gradient(theta_gradient, theta, num_layers, num_labels, X, y, lamda)>>>
+	
+	// perform the reduction here.
 	
 	for(i=0; i<num_layers-1; i++)
 	{
