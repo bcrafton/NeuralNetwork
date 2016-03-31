@@ -10,6 +10,6 @@ The user DOES NOT need to specify the number of iterations that they would like 
 **./a.out**
 ### Running the code on the discovery cluster
 In this repo there is a script called NN_cuda.bash. In this script I include both the compile shell command and the command to execute the code for 100 iterations. The user only needs to **modify the script for their name and directory** on the discovery cluster and execute:</br>
-**bsub< NN_cuda.bash**
+**bsub< NN_cuda.bash**</br>
 NOTE:</br>
 User must be logged into GPU node: **bsub -Is -XF -q par-gpu -n 1 /bin/bash**
