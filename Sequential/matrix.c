@@ -406,4 +406,19 @@ unsigned int matrix_memory_size(matrix_t* m)
 	return sizeof(matrix_t) + sizeof(float) * m->rows * m->cols;
 }
 
+void matrix_add2(matrix_t* m1, matrix_t* m2, matrix_t* sum)
+{
+	assert(m1 != NULL && m2 != NULL);
+	assert(m1->rows > 0 && m2->rows > 0 && m1->cols > 0 && m2->cols > 0);
+	assert(m1->rows == m2->rows && m1->cols == m2->cols);
+
+	int i, j;
+	for(i=0; i<m1->rows; i++)
+	{
+		for(j=0; j<m1->cols; j++)
+		{
+			matrix_set(sum, i, j, matrix_get(m1, i, j) + matrix_get(m2, i, j));
+		}
+	}
+}
 

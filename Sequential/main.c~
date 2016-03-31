@@ -1,4 +1,4 @@
-#include "nn_include.h"
+#include "NNinclude.h"
 #include "neural_network.h"
 
 #define MATRIX_TEST 0

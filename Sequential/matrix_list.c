@@ -67,3 +67,14 @@ unsigned int matrix_list_memory_size(matrix_list_t* m)
 	}
 	return memory_size;
 }
+
+void matrix_list_add2(matrix_list_t* m1, matrix_list_t* m2, matrix_list_t* sum)
+{
+	assert(m1->num == m2->num && m1->num == sum->num);
+
+	int i;
+	for(i=0; i<m1->num; i++)
+	{
+		matrix_add2(m1->matrix_list[i], m2->matrix_list[i], sum->matrix_list[i]);
+	}
+}
