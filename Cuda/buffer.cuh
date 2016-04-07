@@ -1,4 +1,4 @@
-#include "NNinclude.cuh"
+#include "nn_include.cuh"
 
 typedef struct buffer_t
 {

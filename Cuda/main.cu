@@ -1,5 +1,5 @@
-#include "NNinclude.cuh"
-#include "NeuralNetwork.cuh"
+#include "nn_include.cuh"
+#include "neural_network.cuh"
 
 #define MATRIX_TEST 0
 #define MATRIX_UTIL_TEST 0
