@@ -24,7 +24,7 @@ int main(int argc,char **argv) {
     unsigned int iteration_number = atoi(argv[1]);
    	*/
 
-	unsigned int iteration_number = 10;
+	unsigned int iteration_number = 100;
 
 	matrix_list_t* theta = matrix_list_constructor(2);
 	//theta->matrix_list[0] = matrix_random(25, 401, .12);
@@ -35,16 +35,16 @@ int main(int argc,char **argv) {
 	assert(theta->num == 2);
 	assert(theta->matrix_list[0]->rows == 25 && theta->matrix_list[0]->cols == 401);
 	assert(theta->matrix_list[1]->rows == 10 && theta->matrix_list[1]->cols == 26);
-	
+	/*
 	matrix_t* X = load_from_file("X.csv", 5000, 400);
 	matrix_t* tmp = load_from_file("y.csv", 5000, 1);
 	matrix_t* y = matrix_transpose(tmp);
 	free_matrix(tmp);
+	*/
+	gradient_descent(&theta, num_layers, num_labels, lambda, iteration_number);
 
-	gradient_descent(&theta, num_layers, num_labels, X, y, lambda, iteration_number);
-
-	free_matrix(X);
-	free_matrix(y);
+	//free_matrix(X);
+	//free_matrix(y);
 	free_matrix_list(theta);
 #endif
 	return 1;

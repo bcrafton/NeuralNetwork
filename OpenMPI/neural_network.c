@@ -54,7 +54,7 @@ void calculate_gradient_at(int index, matrix_list_t** gradient, matrix_list_t* t
 	}
 	temp = matrix_transpose(result);
 	free_matrix(result);
-	result= temp;
+	result = temp;
 
 	delta->matrix_list[1] = matrix_subtract(A->matrix_list[num_layers-1], result);
 	free_matrix(result);
@@ -93,83 +93,32 @@ void calculate_gradient_at(int index, matrix_list_t** gradient, matrix_list_t* t
 	*gradient = local_gradient;
 }
 
-void calculate_gradient(matrix_list_t** gradient, matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
+void calculate_gradient(int rank, int size, matrix_list_t** gradient, matrix_list_t* theta, unsigned int num_layers, unsigned int num_labels,
 		matrix_t* X, matrix_t* y, double lamda)
 {
-	unsigned int layer_sizes[][2] = {{25, 401}, {10, 26}};
-	unsigned int i, j;
 	unsigned int m = X->rows;
 	//unsigned int n = X->cols;
+	
+	matrix_list_t* gradient_sum = matrix_list_constructor(theta->num);
+	unsigned int i, j;
+	for(i=0; i<gradient_sum->num; i++)
+	{
+		gradient_sum->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
+	}
+	
+	
 
-	matrix_t* rolled_theta = roll_matrix_list(theta);
-	
-	matrix_t* rolled_gradient_sum = matrix_constructor(rolled_theta->rows, rolled_theta->cols);
-	matrix_list_t* gradient_sum;
-	
 	matrix_list_t* local_gradient;
-	matrix_t* rolled_local_gradient_sum;
-	matrix_list_t* local_gradient_sum;
-	
-	void* all_gradients = NULL;
 
-	int rank;
-	int size;
-	int argc = 0;
-	char** argv = NULL;
-	
-	MPI_Status status;
-	MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	if(rank != 0)
-	{
-		X = matrix_constructor(5000, 400);
-		y = matrix_constructor(5000, 1);
-		rolled_theta = matrix_constructor(1, layer_sizes[0][0]*layer_sizes[0][1] + layer_sizes[1][0]*layer_sizes[1][1]);
-	}
-	
-	MPI_Bcast(X, matrix_memory_size(X), MPI_CHAR, 0, MPI_COMM_WORLD);
-	MPI_Bcast(y, matrix_memory_size(y), MPI_CHAR, 0, MPI_COMM_WORLD);
-	MPI_Bcast(rolled_theta, matrix_memory_size(rolled_theta), MPI_CHAR, 0, MPI_COMM_WORLD);
-	
-	theta = unroll_matrix_list(rolled_theta, num_layers-1, layer_sizes);
-	
-	local_gradient_sum = matrix_list_constructor(theta->num);
-	for(i=0; i<local_gradient_sum->num; i++)
-	{
-		local_gradient_sum->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
-	}
-	
 	int indexes[2];
 	get_indexes(m, size, rank, indexes);
 	for(i=indexes[0]; i<indexes[1]; i++)
 	{
 		calculate_gradient_at(i, &local_gradient, theta, num_layers, num_labels, X, y, lamda);
-		matrix_list_add2(local_gradient_sum, local_gradient, local_gradient_sum);
+		matrix_list_add2(gradient_sum, local_gradient, gradient_sum);
 		free_matrix_list(local_gradient);
 	}
-	
-	rolled_local_gradient_sum = roll_matrix_list(local_gradient_sum);
-	
-	if(rank == 0)
-	{
-		all_gradients = malloc(matrix_memory_size(rolled_local_gradient_sum)*size);
-	}
-	
-	MPI_Gather(&rolled_local_gradient_sum, matrix_memory_size(rolled_local_gradient_sum), MPI_CHAR, all_gradients, matrix_memory_size(rolled_local_gradient_sum), MPI_CHAR, 0, MPI_COMM_WORLD);
 
-	if(rank == 0)
-	{
-		for(i=0; i<size; i++)
-		{
-				matrix_add2(rolled_gradient_sum, rolled_gradient_sum, rolled_gradient_sum);
-		}
-		gradient_sum = unroll_matrix_list(rolled_gradient_sum, num_layers-1, layer_sizes);
-	}
-	
-	MPI_Finalize();
-	
 	matrix_t* temp;
 	matrix_t* temp2;
 	matrix_t* temp3;
@@ -189,43 +138,100 @@ void calculate_gradient(matrix_list_t** gradient, matrix_list_t* theta, unsigned
 		free_matrix(temp2);
 		free_matrix(temp3);
 	}
-
 	*gradient = gradient_sum;
 }
 
 
-void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned int num_labels, matrix_t* X, matrix_t* y,
+void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned int num_labels,
 		double lamda, unsigned int iteration_number)
 {
-	clock_t start, end;
-	double cpu_time_used;
-	start = clock();
+	unsigned int i, j;
+	unsigned int layer_sizes[][2] = {{25, 401}, {10, 26}};
+	double start_time;
 
-	matrix_list_t* gradient;
+	matrix_list_t* gradient = matrix_list_constructor((*theta)->num);
+	for(i=0; i<gradient->num; i++)
+	{
+		gradient->matrix_list[i] = matrix_constructor((*theta)->matrix_list[i]->rows, (*theta)->matrix_list[i]->cols);
+	}
 
-	unsigned int i;
+	void* buffer = NULL; 
+
+	int rank;
+	int size;
+	int argc = 0;
+	char** argv = NULL;
+	
+	MPI_Status status;
+	MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	
+	start_time = MPI_Wtime();
+
+	if(rank == 0)
+	{
+		buffer = malloc((sizeof(matrix_t) + sizeof(float) * (layer_sizes[0][0]*layer_sizes[0][1] + layer_sizes[1][0]*layer_sizes[1][1]))*size);
+	}
+
+	matrix_t* X = load_from_file("X.csv", 5000, 400);
+	matrix_t* tmp = load_from_file("y.csv", 5000, 1);
+	matrix_t* y = matrix_transpose(tmp);
+	free_matrix(tmp);
+
 	for(i=0; i < iteration_number; i++)
 	{
-		calculate_gradient(&gradient, *theta, num_layers, num_labels, X, y, lamda);
-
-		matrix_list_t* tmp;
-		tmp = matrix_list_scalar_multiply(gradient, ALPHA);
-		free_matrix_list(gradient);
-		gradient = tmp;
-
-		tmp = matrix_list_subtract(*theta, gradient);
-		free_matrix_list(*theta);
-		*theta = tmp;
-
-		free_matrix_list(gradient);
-
-		if((i+1) % 10 == 0)
+		matrix_t* rolled_theta = matrix_constructor(1, layer_sizes[0][0]*layer_sizes[0][1] + layer_sizes[1][0]*layer_sizes[1][1]);
+		if(rank == 0)
 		{
-			end = clock();
-			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-			printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(*theta, X, y), cpu_time_used);
+			rolled_theta = roll_matrix_list(*theta);
+		}
+		
+		MPI_Bcast(rolled_theta, matrix_memory_size(rolled_theta), MPI_CHAR, 0, MPI_COMM_WORLD);
+		if(rank != 0)
+		{
+			*theta = unroll_matrix_list(rolled_theta, num_layers-1, layer_sizes);
+		}
+
+		matrix_list_t* local_gradient;
+		calculate_gradient(rank, size, &local_gradient, *theta, num_layers, num_labels, X, y, lamda);
+		
+		matrix_t* rolled_local_gradient = roll_matrix_list(local_gradient);
+		
+		MPI_Gather(rolled_local_gradient, matrix_memory_size(rolled_local_gradient), MPI_CHAR, buffer, matrix_memory_size(rolled_local_gradient), MPI_CHAR, 0, MPI_COMM_WORLD);
+		
+		if(rank == 0)
+		{
+			int memory_size = matrix_memory_size(rolled_local_gradient);
+			for(j=0; j<size; j++)
+			{
+				rolled_local_gradient = (matrix_t*) (buffer + j*memory_size);
+				local_gradient = unroll_matrix_list(rolled_local_gradient, num_layers-1, layer_sizes);
+				matrix_list_add2(gradient, local_gradient, gradient);
+			}
+			
+			matrix_list_t* tmp;
+			tmp = matrix_list_scalar_multiply(gradient, ALPHA);
+			free_matrix_list(gradient);
+			gradient = tmp;
+
+			tmp = matrix_list_subtract(*theta, gradient);
+			free_matrix_list(*theta);
+			*theta = tmp;
+
+			for(j=0; j<gradient->num; j++)
+			{
+				set_matrix(gradient->matrix_list[j], 0.0);
+			}
+
+			if((i+1) % 10 == 0)
+			{
+				double cpu_time_used = MPI_Wtime() - start_time;
+				printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(*theta, X, y), cpu_time_used);
+			}
 		}
 	}
+	MPI_Finalize();
 }
 
 

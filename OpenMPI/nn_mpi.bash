@@ -2,11 +2,11 @@
 #BSUB -J Brian-Hello
 #BSUB -o output
 #BSUB -e error
-#BSUB -n 20
-#BSUB -R "span[ptile=5]"
+#BSUB -n 32
+#BSUB -R "span[ptile=8]"
 #BSUB -q ht-10g
-#BSUB cwd /home/crafton.b/nn_mpi1/
-cd /home/crafton.b/nn_mpi1/
+#BSUB cwd /home/crafton.b/nn_mpi2/
+cd /home/crafton.b/nn_mpi2/
 
 rm error
 rm output
