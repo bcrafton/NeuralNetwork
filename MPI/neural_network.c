@@ -119,25 +119,6 @@ void calculate_gradient(int rank, int size, matrix_list_t** gradient, matrix_lis
 		free_matrix_list(local_gradient);
 	}
 
-	matrix_t* temp;
-	matrix_t* temp2;
-	matrix_t* temp3;
-	
-	for(i=0; i<num_layers-1; i++)
-	{
-		temp = matrix_scalar_multiply(gradient_sum->matrix_list[i], 1.0/m);
-		temp2 = copy_matrix(theta->matrix_list[i]);
-		for(j=0; j<theta->matrix_list[i]->rows; j++)
-		{
-			matrix_set(temp2, j, 0, 0.0);
-		}
-		free_matrix(gradient_sum->matrix_list[i]);
-		temp3 = matrix_scalar_multiply(temp2, lamda/m);
-		gradient_sum->matrix_list[i] = matrix_add(temp, temp3);
-		free_matrix(temp);
-		free_matrix(temp2);
-		free_matrix(temp3);
-	}
 	*gradient = gradient_sum;
 }
 
@@ -179,6 +160,8 @@ void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned i
 	matrix_t* y = matrix_transpose(tmp);
 	free_matrix(tmp);
 
+	unsigned int m = X->rows;
+
 	for(i=0; i < iteration_number; i++)
 	{
 		matrix_t* rolled_theta = matrix_constructor(1, layer_sizes[0][0]*layer_sizes[0][1] + layer_sizes[1][0]*layer_sizes[1][1]);
@@ -209,6 +192,26 @@ void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned i
 				local_gradient = unroll_matrix_list(rolled_local_gradient, num_layers-1, layer_sizes);
 				matrix_list_add2(gradient, local_gradient, gradient);
 			}
+
+			matrix_t* temp;
+			matrix_t* temp2;
+			matrix_t* temp3;
+	
+			for(i=0; i<num_layers-1; i++)
+			{
+				temp = matrix_scalar_multiply(gradient->matrix_list[i], 1.0/m);
+				temp2 = copy_matrix((*theta)->matrix_list[i]);
+				for(j=0; j<(*theta)->matrix_list[i]->rows; j++)
+				{
+					matrix_set(temp2, j, 0, 0.0);
+				}
+				free_matrix(gradient->matrix_list[i]);
+				temp3 = matrix_scalar_multiply(temp2, lamda/m);
+				gradient->matrix_list[i] = matrix_add(temp, temp3);
+				free_matrix(temp);
+				free_matrix(temp2);
+				free_matrix(temp3);
+			}
 			
 			matrix_list_t* tmp;
 			tmp = matrix_list_scalar_multiply(gradient, ALPHA);
@@ -224,7 +227,7 @@ void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned i
 				set_matrix(gradient->matrix_list[j], 0.0);
 			}
 
-			if((i+1) % 10 == 0)
+			if((i+1) % 100 == 0)
 			{
 				double cpu_time_used = MPI_Wtime() - start_time;
 				printf("iteration #%d, accuracy: %f, time used: %f\n", i+1, accuracy(*theta, X, y), cpu_time_used);
