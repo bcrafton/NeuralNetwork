@@ -106,8 +106,6 @@ void calculate_gradient(int rank, int size, matrix_list_t** gradient, matrix_lis
 		gradient_sum->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
 	}
 	
-	
-
 	matrix_list_t* local_gradient;
 
 	int indexes[2];
@@ -126,7 +124,7 @@ void calculate_gradient(int rank, int size, matrix_list_t** gradient, matrix_lis
 void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned int num_labels,
 		double lamda, unsigned int iteration_number)
 {
-	unsigned int i, j;
+	unsigned int i, j, k;
 	unsigned int layer_sizes[][2] = {{25, 401}, {10, 26}};
 	double start_time;
 
@@ -196,23 +194,27 @@ void gradient_descent(matrix_list_t** theta, unsigned int num_layers, unsigned i
 			matrix_t* temp;
 			matrix_t* temp2;
 			matrix_t* temp3;
-	
-			for(i=0; i<num_layers-1; i++)
+			
+			for(j=0; j<num_layers-1; j++)
 			{
-				temp = matrix_scalar_multiply(gradient->matrix_list[i], 1.0/m);
-				temp2 = copy_matrix((*theta)->matrix_list[i]);
-				for(j=0; j<(*theta)->matrix_list[i]->rows; j++)
+				
+				temp = matrix_scalar_multiply(gradient->matrix_list[j], 1.0/m);
+				temp2 = copy_matrix((*theta)->matrix_list[j]);
+				for(k=0; k<(*theta)->matrix_list[j]->rows; k++)
 				{
-					matrix_set(temp2, j, 0, 0.0);
+					matrix_set(temp2, k, 0, 0.0);
 				}
-				free_matrix(gradient->matrix_list[i]);
+				
+				free_matrix(gradient->matrix_list[j]);
 				temp3 = matrix_scalar_multiply(temp2, lamda/m);
-				gradient->matrix_list[i] = matrix_add(temp, temp3);
+				gradient->matrix_list[j] = matrix_add(temp, temp3);
+
 				free_matrix(temp);
 				free_matrix(temp2);
 				free_matrix(temp3);
 			}
 			
+
 			matrix_list_t* tmp;
 			tmp = matrix_list_scalar_multiply(gradient, ALPHA);
 			free_matrix_list(gradient);
