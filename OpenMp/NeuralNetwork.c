@@ -1,6 +1,6 @@
 #include "NeuralNetwork.h"
 
-#define ALPHA .25
+#define ALPHA .5
 
 static void get_indexes(int problem_size, int num_threads, int tid, int* indexes);
 
