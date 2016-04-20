@@ -24,7 +24,7 @@ int main(int argc,char **argv) {
     unsigned int iteration_number = atoi(argv[1]);
    	*/
 
-	unsigned int iteration_number = 10;
+	unsigned int iteration_number = 100;
 
 	matrix_list_t* theta = matrix_list_constructor(2);
 	//theta->matrix_list[0] = matrix_random(25, 401, .12);

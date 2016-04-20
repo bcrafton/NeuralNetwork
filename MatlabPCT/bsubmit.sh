@@ -17,7 +17,7 @@
 #BSUB -n 1
 
 # enter the work directory - this should be in scratch
-work=/home/crafton.b/matlab_nn/
+work=/home/crafton.b/NeuralNetwork/MatlabPCT/
 
 # enter the matlab file which is to be placed or copied into your work directory
 Matlab_infile=ex4

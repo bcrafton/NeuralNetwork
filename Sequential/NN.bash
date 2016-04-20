@@ -2,12 +2,9 @@
 #BSUB -J BrianHello
 #BSUB -o output_file
 #BSUB -e error file
-#BSUB -n l
+#BSUB -n 1
 #BSUB -q ht-10g
-#BSUB cwd /home/crafton.b/NN/src/
+#BSUB cwd .
 
-work=/home/crafton.b/NN/src/
-cd $work
-
-gcc -g main.c matrix.c matrix_util.c NeuralNetwork.c vector.c -lm
+gcc -g main.c matrix.c matrix_util.c neural_network.c vector.c matrix_list.c -lm
 ./a.out 100
