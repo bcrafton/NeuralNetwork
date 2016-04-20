@@ -1,4 +1,4 @@
-# Sequential Implementation
+# MPI Implementation
 This is the sequential implementation of the Neural Network
 ### Compilation
 This is written for mpiCC.
