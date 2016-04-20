@@ -12,4 +12,5 @@ The user DOES NOT need to specify the number of iterations that they would like 
 In this repo there is a script called NN_cuda.bash. In this script I include both the compile shell command and the command to execute the code for 100 iterations. The user only needs to **modify the script for their name and directory** on the discovery cluster and execute:</br>
 **bsub< NN_cuda.bash**</br>
 NOTE:</br>
-User must be logged into GPU node: **bsub -Is -XF -q par-gpu -n 1 /bin/bash**
+User must be logged into GPU node: **bsub -Is -XF -q par-gpu -n 1 /bin/bash**</br>
+This code does not actually compute the neural network ... the implementation was a bit much and was not successful
