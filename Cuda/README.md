@@ -13,4 +13,4 @@ In this repo there is a script called NN_cuda.bash. In this script I include bot
 **bsub< NN_cuda.bash**</br>
 NOTE:</br>
 User must be logged into GPU node: **bsub -Is -XF -q par-gpu -n 1 /bin/bash**</br>
-This code does not actually compute the neural network ... the implementation was a bit much and was not successful
+**This code does not actually compute the neural network ... the implementation was a bit much and was not successful**
