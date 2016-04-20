@@ -1,10 +1,10 @@
 #include "NNinclude.h"
 #include "matrix.h"
 
-void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
+void gradient_descent(int num_threads, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
 		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda, unsigned int iteration_number);
 
-double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers, unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda);
+double NN_cost_function(int num_threads, matrix_t** gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers, unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda);
 
 double accuracy(matrix_list_t* theta, matrix_t* X, matrix_t* y);
 

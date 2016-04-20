@@ -4,7 +4,7 @@
 
 static void get_indexes(int problem_size, int num_threads, int tid, int* indexes);
 
-double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
+double NN_cost_function(int num_threads, matrix_t** gradient, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
 		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda)
 {
 	unsigned int theta_sizes[][2] = {{25, 401}, {10, 26}};
@@ -21,7 +21,7 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 		theta_gradient_total->matrix_list[i] = matrix_constructor(theta->matrix_list[i]->rows, theta->matrix_list[i]->cols);
 	}
 	
-	omp_set_num_threads(32);
+	omp_set_num_threads(num_threads);
 	int nthreads, tid;
 	#pragma omp parallel private(nthreads, tid)
 	{
@@ -153,7 +153,7 @@ double NN_cost_function(matrix_t** gradient, matrix_t* rolled_theta, unsigned in
 }
 
 
-void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
+void gradient_descent(int num_threads, matrix_t* rolled_theta, unsigned int layer_sizes[], unsigned int num_layers,
 		unsigned int num_labels, matrix_t* X, matrix_t* y, double lamda, unsigned int iteration_number)
 {
 	double start, end;
@@ -166,7 +166,7 @@ void gradient_descent(matrix_t* rolled_theta, unsigned int layer_sizes[], unsign
 	unsigned int i;
 	for(i=0; i < iteration_number; i++)
 	{
-		NN_cost_function(&gradient, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lamda);
+		NN_cost_function(num_threads, &gradient, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lamda);
 
 		matrix_t* tmp;
 		tmp = matrix_scalar_multiply(gradient, ALPHA);

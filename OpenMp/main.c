@@ -16,12 +16,14 @@ int main(int argc,char **argv) {
 	double lambda = 0.8;
 	
 	
-	if(argc < 2)
+	if(argc < 3)
 	{
-		printf("need exactly 1 argument for vector length\n");
+		printf("need exactly 2 arguments for vector length and num threads\n");
 		return 0;
 	}
     	unsigned int iteration_number = atoi(argv[1]);
+	unsigned int num_threads = atoi(argv[2]);
+
    	
 
 	//unsigned int iteration_number = 10000;
@@ -42,7 +44,7 @@ int main(int argc,char **argv) {
 	matrix_t* y = matrix_transpose(tmp);
 	free_matrix(tmp);
 
-	gradient_descent(rolled_theta, layer_sizes, num_layers, num_labels, X, y, lambda, iteration_number);
+	gradient_descent(num_threads, rolled_theta, layer_sizes, num_layers, num_labels, X, y, lambda, iteration_number);
 
 	free_matrix(X);
 	free_matrix(y);

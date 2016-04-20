@@ -23,9 +23,7 @@ m = size(X, 1);
 J = 0;
 
 spmd
-    start = (labindex-1)*(m/numlabs) + 1;
-    last = labindex * (m/numlabs);
-    
+    [start, last] = get_indexes(labindex, m, numlabs);
     Theta_grad_local = cell(2,1);
 
     for i = 1:num_layers-1
