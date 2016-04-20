@@ -1,15 +1,15 @@
 #!/bin/sh
 #BSUB -J Brian-Hello
-#BSUB -o output
-#BSUB -e error
-#BSUB -n 32
-#BSUB -R "span[ptile=8]"
+#BSUB -o output4
+#BSUB -e error4
+#BSUB -n 4
+#BSUB -R "span[ptile=16]"
 #BSUB -q ht-10g
-#BSUB cwd /home/crafton.b/nn_mpi2/
-cd /home/crafton.b/nn_mpi2/
+#BSUB cwd .
+cd .
 
-rm error
-rm output
+rm error4
+rm output4
 
 tempfile1=hostlistrun
 tempfile2=hostlist-tcp
@@ -24,4 +24,4 @@ for ((i=0; i<${#hosts[@]}; i += 2)) ;
 done
 
 mpiCC -o a.out main.c matrix.c matrix_list.c vector.c neural_network.c matrix_util.c
-mpirun -np 20 -prot -TCP -lsf ./a.out
+mpirun -np 4 -prot -TCP -lsf ./a.out
